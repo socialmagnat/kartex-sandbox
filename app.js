@@ -46,35 +46,33 @@ const start = async () => {
                 const token = createToken(privateKey, body);
 
                 const url = req.headers['url'];
+                const method = req.headers['method'];
                 if(!url){
                     return res.status(400).json({message: "url error"});
                 }
 
                 if(login === req.headers['login'] && password === req.headers['password']){
                     try {
-                        const response = await axios({
-                            method: 'post',
+                        const options = {
+                            method: method,
                             headers: {
                                 'X-Audit-Source-Type': 'Backend',
                                 'X-Audit-User-Id': 'KartexUser',
                                 'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
+                                'Authorization': `Bearer ${token}`,
+                                'X-Product-Code': 'KartexTechTest'
                             },
                             url: url,
-                            data: body
-                        });
+                        };
+                        if(method !== 'get'){
+                            options.data = body;
+                        }
+
+                        const response = await axios(options);
 
                         res.status(200).json(response.data);
-                    } catch (err) {
-                        console.log("-------------------");
-                        // console.log(err.request.outputData);
-                        console.log(Object.keys(err))
-                        console.log(err.message)
-
-                        // console.log(err.request.response)
-
-                        // console.log(err.request)
-                        
+                    } catch (err) {                        
+                        res.status(400).json(err.response.data);
                     }
                 } else {
                     res.status(400).json({message: 'error auth data'});
