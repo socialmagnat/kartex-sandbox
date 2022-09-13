@@ -51,19 +51,31 @@ const start = async () => {
                 }
 
                 if(login === req.headers['login'] && password === req.headers['password']){
-                    const response = await axios({
-                        method: 'post',
-                        headers: {
-                            'X-Audit-Source-Type': 'Backend',
-                            'X-Audit-User-Id': 'KartexUser',
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        url: url,
-                        data: body
-                    });
+                    try {
+                        const response = await axios({
+                            method: 'post',
+                            headers: {
+                                'X-Audit-Source-Type': 'Backend',
+                                'X-Audit-User-Id': 'KartexUser',
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            url: url,
+                            data: body
+                        });
 
-                    res.status(200).json(response.data);
+                        res.status(200).json(response.data);
+                    } catch (err) {
+                        console.log("-------------------");
+                        // console.log(err.request.outputData);
+                        console.log(Object.keys(err))
+                        console.log(err.message)
+
+                        // console.log(err.request.response)
+
+                        // console.log(err.request)
+                        
+                    }
                 } else {
                     res.status(400).json({message: 'error auth data'});
                 }
